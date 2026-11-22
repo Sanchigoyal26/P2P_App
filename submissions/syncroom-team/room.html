@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncRoom | Music Room</title>
+    <link rel="stylesheet" href="css/room.css">
+</head>
+<body>
+
+<header class="topbar">
+    <a href="index.html" class="logo">♫ SyncRoom</a>
+    <div class="connection">
+        <span class="dot"></span>
+        Waiting for peer connection
+    </div>
+    <button class="leave-btn" id="leaveRoom">Leave Room</button>
+</header>
+
+<main class="layout">
+
+    <section class="player-section">
+
+        <div class="room-heading">
+            <div>
+                <p class="eyebrow">YOUR LISTENING SPACE</p>
+                <h1>Music Room</h1>
+            </div>
+            <div class="room-code">
+                <small>ROOM CODE</small>
+                <strong id="displayRoomCode">------</strong>
+            </div>
+        </div>
+
+        <div class="album-art">
+            <div class="album-symbol">♫</div>
+            <div class="album-caption">SYNCROOM SESSIONS</div>
+        </div>
+
+        <div class="song-info">
+            <h2 id="songTitle">No song selected</h2>
+            <p id="songArtist">Upload an audio file to get started</p>
+        </div>
+
+        <input type="file" id="audioUpload" accept="audio/*" hidden>
+
+        <button class="upload-btn" id="uploadButton">
+            ＋ Upload Music
+        </button>
+
+        <audio id="audioPlayer" controls></audio>
+
+        <div class="player-note">
+            Select a music file from your device.
+        </div>
+
+    </section>
+
+    <aside class="sidebar">
+
+        <section class="panel">
+            <h3>Room Members</h3>
+            <div class="member">
+                <div class="avatar">Y</div>
+                <div>
+                    <strong id="memberName">You</strong>
+                    <small>Room creator</small>
+                </div>
+                <span class="online-dot"></span>
+            </div>
+            <div class="member">
+                <div class="avatar friend-avatar">?</div>
+                <div>
+                    <strong>Waiting for friend</strong>
+                    <small>Not connected</small>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel chat-panel">
+            <h3>Room Chat</h3>
+
+            <div class="chat-messages" id="chatMessages">
+                <p class="welcome-message">
+                    Welcome to SyncRoom! Start a conversation.
+                </p>
+            </div>
+
+            <form id="chatForm" class="chat-form">
+                <input
+                    type="text"
+                    id="chatInput"
+                    placeholder="Write a message..."
+                    autocomplete="off"
+                >
+                <button type="submit">↑</button>
+            </form>
+
+            <small class="chat-note">
+                Local preview · P2P chat coming next
+            </small>
+        </section>
+
+    </aside>
+
+</main>
+
+<script src="js/room.js"></script>
+</body>
+</html>
