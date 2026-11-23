@@ -1,19 +1,18 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SyncRoom | Music Room</title>
-    <link rel="stylesheet" href="css/room.css">
+    <link rel="stylesheet" href="./css/room.css">
 </head>
 <body>
 
 <header class="topbar">
-    <a href="index.html" class="logo">♫ SyncRoom</a>
-    <div class="connection">
+    <a href="./index.html" class="logo">♫ SyncRoom</a>
+    <div class="connection" id="connectionStatus" aria-live="polite">
         <span class="dot"></span>
-        Waiting for peer connection
+        <span id="connectionText">Initialising…</span>
     </div>
     <button class="leave-btn" id="leaveRoom">Leave Room</button>
 </header>
@@ -26,10 +25,12 @@
             <div>
                 <p class="eyebrow">YOUR LISTENING SPACE</p>
                 <h1>Music Room</h1>
+                <p class="subtle" id="welcomeText"></p>
             </div>
             <div class="room-code">
                 <small>ROOM CODE</small>
                 <strong id="displayRoomCode">------</strong>
+                <button class="copy-btn" id="copyRoomCode" type="button">Copy invite</button>
             </div>
         </div>
 
@@ -43,69 +44,66 @@
             <p id="songArtist">Upload an audio file to get started</p>
         </div>
 
-        <input type="file" id="audioUpload" accept="audio/*" hidden>
+        <div class="mode-picker">
+            <label for="playbackMode">LISTENING MODE</label>
+            <select id="playbackMode">
+                <option value="sync">Synchronized local playback (everyone has the same file)</option>
+                <option value="stream">Host streams audio live to everyone</option>
+            </select>
+            <p class="hint" id="playerNote"></p>
+        </div>
 
-        <button class="upload-btn" id="uploadButton">
-            ＋ Upload Music
-        </button>
+        <input type="file" id="audioUpload" accept="audio/*" hidden>
+        <button class="upload-btn" id="uploadButton" type="button">＋ Upload Music</button>
 
         <audio id="audioPlayer" controls></audio>
 
-        <div class="player-note">
-            Select a music file from your device.
+        <div class="remote-audio-wrap" id="remoteAudioWrap" hidden>
+            <strong>Incoming audio from the host</strong>
+            <div id="remoteAudioList"></div>
         </div>
+
+        <button class="enable-btn" id="enableAudio" type="button" hidden>▶ Enable audio</button>
+        <p class="status-line" id="mediaStatus"></p>
 
     </section>
 
     <aside class="sidebar">
 
         <section class="panel">
-            <h3>Room Members</h3>
-            <div class="member">
-                <div class="avatar">Y</div>
-                <div>
-                    <strong id="memberName">You</strong>
-                    <small>Room creator</small>
-                </div>
-                <span class="online-dot"></span>
-            </div>
-            <div class="member">
-                <div class="avatar friend-avatar">?</div>
-                <div>
-                    <strong>Waiting for friend</strong>
-                    <small>Not connected</small>
-                </div>
-            </div>
+            <h3>Room Members <span class="count" id="memberCount">1</span></h3>
+            <div id="membersList"></div>
         </section>
 
         <section class="panel chat-panel">
             <h3>Room Chat</h3>
-
-            <div class="chat-messages" id="chatMessages">
-                <p class="welcome-message">
-                    Welcome to SyncRoom! Start a conversation.
-                </p>
-            </div>
-
+            <div class="chat-messages" id="chatMessages"></div>
             <form id="chatForm" class="chat-form">
-                <input
-                    type="text"
-                    id="chatInput"
-                    placeholder="Write a message..."
-                    autocomplete="off"
-                >
-                <button type="submit">↑</button>
+                <input type="text" id="chatInput" placeholder="Write a message..." autocomplete="off" maxlength="500" aria-label="Message">
+                <button type="submit" aria-label="Send">↑</button>
             </form>
-
-            <small class="chat-note">
-                Local preview · P2P chat coming next
-            </small>
+            <small class="chat-note">Sent directly to peers over WebRTC · history kept on this device</small>
+            <details class="diag">
+                <summary>Connection diagnostics</summary>
+                <ul id="diagLog"></ul>
+            </details>
         </section>
 
     </aside>
 
 </main>
 
-<script src="js/room.js"></script>
+<!-- Shown only when someone opens a shared room link without having chosen a name -->
+<div class="name-overlay" id="namePrompt" hidden>
+    <form class="name-card" id="nameForm">
+        <h2>Join this room</h2>
+        <p class="subtle">Pick a display name. It is just a label, not a verified identity.</p>
+        <input id="nameInput" maxlength="20" placeholder="Your name" autocomplete="nickname" required>
+        <button class="upload-btn" type="submit">Join</button>
+    </form>
+</div>
+
+<!-- type="module" is required because room.js uses `import` -->
+<script type="module" src="./js/room.js"></script>
 </body>
 </html>
