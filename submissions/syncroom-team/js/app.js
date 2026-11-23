@@ -1,71 +1,47 @@
+const APP_ID = "syncroom.example.p2p-music.v1";
+const $ = (id) => document.getElementById(id);
 
-const usernameInput = document.getElementById("username");
-const roomCodeInput = document.getElementById("roomCode");
-const createButton = document.getElementById("createRoom");
-const joinButton = document.getElementById("joinRoom");
-const message = document.getElementById("message");
+const usernameInput = $("username");
+const roomCodeInput = $("roomCode");
+const message = $("message");
 
-function showMessage(text, success = true) {
-    message.textContent = text;
-    message.style.color = success ? "#86efac" : "#fca5a5";
+function showMessage(text, isError = false) {
+  message.textContent = text;
+  message.classList.toggle("error", isError);
 }
 
-function getUsername() {
-    const username = usernameInput.value.trim();
-
-    if (!username) {
-        showMessage("Please enter your name first.", false);
-        usernameInput.focus();
-        return null;
-    }
-
-    localStorage.setItem("syncroom_username", username);
-    return username;
+function makeRoomCode() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = crypto.getRandomValues(new Uint8Array(6));
+  return Array.from(bytes, (byte) => chars[byte % chars.length]).join("");
 }
 
-function generateRoomCode() {
-    return Math.random().toString(36).substring(2, 8).toUpperCase();
+function enterRoom(code, isHost) {
+  const username = usernameInput.value.trim();
+  if (!username) {
+    showMessage("Please enter your display name.", true);
+    usernameInput.focus();
+    return;
+  }
+  if (!/^[A-Z0-9]{6}$/.test(code)) {
+    showMessage("Room codes must contain exactly 6 letters or numbers.", true);
+    return;
+  }
+
+  sessionStorage.setItem("syncroom_username", username);
+  sessionStorage.setItem("syncroom_room", code);
+  sessionStorage.setItem("syncroom_is_host", String(isHost));
+  window.location.href = `room.html#${encodeURIComponent(code)}`;
 }
 
-// CREATE ROOM
-createButton.addEventListener("click", () => {
-    const username = getUsername();
-
-    if (!username) return;
-
-    const roomCode = generateRoomCode();
-
-    roomCodeInput.value = roomCode;
-
-    localStorage.setItem("syncroom_room_code", roomCode);
-
-    window.location.href = "room.html";
+$("createRoom").addEventListener("click", () => enterRoom(makeRoomCode(), true));
+$("joinRoom").addEventListener("click", () => {
+  const code = roomCodeInput.value.trim().toUpperCase();
+  enterRoom(code, false);
 });
-
-// JOIN ROOM
-joinButton.addEventListener("click", () => {
-    const username = getUsername();
-
-    if (!username) return;
-
-    const roomCode = roomCodeInput.value.trim().toUpperCase();
-
-    if (!/^[A-Z0-9]{6}$/.test(roomCode)) {
-        showMessage(
-            "Please enter a valid 6-character room code.",
-            false
-        );
-        return;
-    }
-
-    localStorage.setItem("syncroom_room_code", roomCode);
-
-    window.location.href = "room.html";
+roomCodeInput.addEventListener("input", () => {
+  roomCodeInput.value = roomCodeInput.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
 });
-
-// ENTER KEY SUPPORT
-roomCodeInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-        joinButton.click();
-    }
+usernameInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") $("createRoom").click();
 });
