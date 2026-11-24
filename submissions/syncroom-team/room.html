@@ -105,5 +105,18 @@
 
 <!-- type="module" is required because room.js uses `import` -->
 <script type="module" src="./js/room.js"></script>
+<script>
+// Watchdog: if room.js never ran (old cached file, 404, or script error) say so on the page.
+setTimeout(function () {
+  if (window.__syncroomBuild) return;
+  var t = document.getElementById("connectionText");
+  t.textContent = "room.js did not start. Hard-refresh (Ctrl+Shift+R) and check js/room.js is the new file.";
+  document.getElementById("connectionStatus").classList.add("error");
+}, 4000);
+window.addEventListener("error", function (e) {
+  var t = document.getElementById("connectionText");
+  if (t && !window.__syncroomBuild) t.textContent = "Script error: " + e.message;
+});
+</script>
 </body>
 </html>
